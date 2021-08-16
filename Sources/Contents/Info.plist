@@ -29,6 +29,8 @@
 	</dict>
 	<key>LSRequiresCarbon</key>
 	<true/>
+	<key>LSUIElement</key>
+	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>This script needs to control other applications to run.</string>
 	<key>NSAppleMusicUsageDescription</key>
@@ -58,7 +60,7 @@
 		<key>bundleDividerCollapsed</key>
 		<true/>
 		<key>bundlePositionOfDivider</key>
-		<real>0.0</real>
+		<real>0</real>
 		<key>dividerCollapsed</key>
 		<false/>
 		<key>eventLogLevel</key>
