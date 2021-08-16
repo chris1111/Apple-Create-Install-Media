@@ -9,3 +9,6 @@ Downnload ➤ [Create-Install-Media](https://github.com/chris1111/Apple-Create-I
 
 ### See Video How to formate the USB drive correctly ⬇︎
 https://user-images.githubusercontent.com/6248794/129573686-20eaee6d-1cfd-41d6-8c8b-808dd11eed7a.mov
+
+
+- Troubleshooting Terminal ➦ tccutil reset AppleEvents
