@@ -62,7 +62,7 @@ The volume will be renamed INSTAL-MEDIA" OK button name "OK" with multiple selec
 	--If Continue
 	set theAction to button returned of (display dialog "
 
-Choose the location of your Install macOS.app" with icon note buttons {"Quit", "10.9 to 10.12", "10.13 to Ventura 13"} cancel button "Quit" default button {"10.13 to Monterey 12"})
+Choose the location of your Install macOS.app" with icon note buttons {"Quit", "10.9 to 10.12", "10.13 to Ventura 13"} cancel button "Quit" default button {"10.13 to Ventura 13"})
 	if theAction = "10.13 to Ventura 13" then
 		--If 10.13 to Ventura 13
 		display dialog "
