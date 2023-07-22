@@ -1,6 +1,6 @@
 # By chris1111
 #
-# Copyright (c) 2021, chris1111. All Right Reserved
+# Copyright (c) 2021, 2023 chris1111. All Right Reserved
 # Credit: Apple
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -17,14 +17,12 @@
 
 set theAction to button returned of (display dialog "
 Welcome Create Install Media
-
 You can create a bootable USB key 
-from OS X Maverick 10.9 to macOS Ventura 13
+from OS X Maverick 10.9 to macOS Sonoma 14
 		
 Format your USB Drive with Disk Utility 
 in the format Mac OS Extended (Journaled) 
 GUID Partition Map
-
 *****************************
 You must quit Disk Utility to continue 
 installation !" with icon note buttons {"Quit", "Create Install Media"} cancel button "Quit" default button {"Create Install Media"})
@@ -43,7 +41,7 @@ if theAction = "Create Install Media" then
 	activate me
 	set all to paragraphs of (do shell script "ls /Volumes")
 	set w to choose from list all with prompt " 
-To continue, select the volume Monterey 12 you want to use, then press the OK button
+To continue, select the volume you want to use, then press the OK button
 The volume will be renamed INSTAL-MEDIA" OK button name "OK" with multiple selections allowed
 	if w is false then
 		display dialog "Quit Installer " with icon 0 buttons {"EXIT"} default button {"EXIT"}
@@ -61,14 +59,13 @@ The volume will be renamed INSTAL-MEDIA" OK button name "OK" with multiple selec
 	end tell
 	--If Continue
 	set theAction to button returned of (display dialog "
-
-Choose the location of your Install macOS.app" with icon note buttons {"Quit", "10.9 to 10.12", "10.13 to Ventura 13"} cancel button "Quit" default button {"10.13 to Ventura 13"})
-	if theAction = "10.13 to Ventura 13" then
-		--If 10.13 to Ventura 13
+Choose the location of your Install macOS.app" with icon note buttons {"Quit", "10.9 to 10.12", "10.13 to Sonoma 14"} cancel button "Quit" default button {"10.13 to Sonoma 14"})
+	if theAction = "10.13 to Sonoma 14" then
+		--If 10.13 to Sonoma 14
 		display dialog "
-Your choice is 10.13 to Ventura 13
+Your choice is 10.13 to Sonoma 14
 Choose your Install OS X.app 
-From macOS High Sierra to macOS Ventura" with icon note buttons {"Quit", "Continue"} cancel button "Quit" default button {"Continue"}
+From macOS High Sierra to macOS Sonoma" with icon note buttons {"Quit", "Continue"} cancel button "Quit" default button {"Continue"}
 		
 		set InstallOSX to choose file of type {"XLSX", "APPL"} default location (path to applications folder) with prompt "Choose your Install macOS.app"
 		set OSXInstaller to POSIX path of InstallOSX
