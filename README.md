@@ -3,7 +3,7 @@
 ### No fancy code
 ### Credit: Apple
 
-![Screen Shot ](https://user-images.githubusercontent.com/6248794/129571626-11e1ab0f-3e72-4c4a-b933-516b46eced7b.png)
+![Screenshot](https://github.com/chris1111/Apple-Create-Install-Media/assets/6248794/e60a09f4-8f59-4088-8975-24b4f6d9cffd)
 
 ## Troubleshooting Terminal ➦ tccutil reset AppleEvents
 
