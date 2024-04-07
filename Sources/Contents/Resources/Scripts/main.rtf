@@ -92,16 +92,16 @@ Installation time 15 to 25 min on a standard USB key
 			set progress additional description to "Install in Progress "
 			delay 1
 			set progress completed steps to 4
-			
-			set progress additional description to "Install in Progress Wait! "
-			delay 1
-			set progress completed steps to 5
-			
-			set progress additional description to "Installing macOS  wait . . . ."
+			set progress additional description to "Install in Progress Wait . . . 50%
+Installing macOS  to the disk " & Diskpath & ""
 			delay 1
 			--display dialog cmd
 			set cmd to "sudo \"" & OSXInstaller & "Contents/Resources/createinstallmedia\" --volume /Volumes/\"" & Diskpath & "\" --nointeraction"
 			do shell script cmd with administrator privileges
+			set progress completed steps to 5
+			
+			set progress additional description to "Install in Progress 75%"
+			delay 1
 			set progress completed steps to 6
 			
 			set progress additional description to "Install in Progress 90%"
@@ -150,16 +150,16 @@ Installation time 15 to 20 min on a standard USB key
 			set progress additional description to "Install in Progress "
 			delay 1
 			set progress completed steps to 4
-			
-			set progress additional description to "Install in Progress Wait! "
-			delay 1
-			set progress completed steps to 5
-			
-			set progress additional description to "Installing macOS  wait . . . ."
+			set progress additional description to "Install in Progress Wait . . . 50%
+Installing macOS  to the disk " & Diskpath & ""
 			delay 1
 			--display dialog cmd
 			set cmd to "sudo \"" & OSXInstaller & "Contents/Resources/createinstallmedia\" --volume /Volumes/\"" & Diskpath & "\" --applicationpath \"" & OSXInstaller & "\" --nointeraction"
 			do shell script cmd with administrator privileges
+			set progress completed steps to 5
+			
+			set progress additional description to "Install in Progress 75%"
+			delay 1
 			set progress completed steps to 6
 			
 			set progress additional description to "Install in Progress 90%"
