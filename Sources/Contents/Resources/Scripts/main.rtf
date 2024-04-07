@@ -64,11 +64,9 @@ From macOS High Sierra to macOS Sonoma" with icon note buttons {"Quit", "Continu
 			set OSXInstaller to POSIX path of InstallOSX
 			
 			delay 2
-			set the_results to (display alert "Please confirm?
-Create Install Media from" message (InstallOSX as text) buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK" with icon)
-			delay 2
-			set the_results to (display alert "Please confirm?
-Install to" message (Diskpath as text) buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK" with icon)
+			(display dialog "Please confirm your choice?
+Create Install Media from --> " & (InstallOSX as text) & "
+Install to --> " & (Diskpath as text) with icon note buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK")
 			
 			set progress description to "Create Install Media
 ======================================
@@ -124,6 +122,9 @@ Choose the location of your Install macOS.app
 			set OSXInstaller to POSIX path of InstallOSX
 			
 			delay 2
+			(display dialog "Please confirm your choice?
+Create Install Media from --> " & (InstallOSX as text) & "
+Install to --> " & (Diskpath as text) with icon note buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK")
 			
 			set progress description to "Create Install Media
 ======================================
