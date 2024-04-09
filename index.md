@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # Apple-Create-Install-Media
 ## A simple macOS Applications for creating a bootable volume of macOS
 ### No fancy code
