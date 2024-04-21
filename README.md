@@ -5,6 +5,7 @@
 
 ![Screenshot](https://github.com/chris1111/Apple-Create-Install-Media/assets/6248794/e60a09f4-8f59-4088-8975-24b4f6d9cffd)
 
+## `Gatekeeper` then `SIP Security` must be disabled to create macOS Install drive.
 ## Troubleshooting Terminal ➦ tccutil reset AppleEvents
 
 Downnload ➤ [Create-Install-Media](https://github.com/chris1111/Apple-Create-Install-Media/raw/main/Create%20Install%20Media.zip)
