@@ -18,7 +18,7 @@
 set theAction to button returned of (display dialog "
 Welcome Create Install Media
 You can create a bootable USB key 
-from OS X Maverick 10.9 to macOS Sonoma 14
+from OS X Maverick 10.9 to macOS Sequoia 15
 		
 Format your USB Drive with Disk Utility 
 in the format Mac OS Extended (Journaled) 
