@@ -7,7 +7,7 @@ layout: default
 ### No fancy code
 ### Credit: Apple
 
-![Screenshot](https://github.com/chris1111/Apple-Create-Install-Media/assets/6248794/e60a09f4-8f59-4088-8975-24b4f6d9cffd)
+![Screenshot](https://github.com/user-attachments/assets/0eb7b95f-c39b-4e37-8de8-8a53d7c56ac7)
 
 ## Troubleshooting Terminal ➦ tccutil reset AppleEvents
 
