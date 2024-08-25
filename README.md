@@ -11,10 +11,9 @@
 
 Downnload ➤ [Create-Install-Media](https://github.com/chris1111/Apple-Create-Install-Media/raw/main/Create%20Install%20Media.zip)
 
-### See Video How to formate the USB drive correctly ⬇︎
-[![Modular Image Creation](https://user-images.githubusercontent.com/6248794/134072536-7c46b8cc-4d8b-42f9-a28a-3c02734f1f5d.png)](https://youtu.be/U5eCr3_wKJg)
+### See Video How to Use ⬇︎
 
-
+[![Modular Image Creation](https://github.com/user-attachments/assets/68f65560-03ae-4dfe-908f-554e30e2906b)]()
 
 
 
