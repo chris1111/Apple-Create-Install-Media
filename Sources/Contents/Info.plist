@@ -2,65 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleAllowMixedLocalizations</key>
-	<true/>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleExecutable</key>
-	<string>applet</string>
-	<key>CFBundleIconFile</key>
-	<string>applet</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.apple.ScriptEditor.id.Create-Install-Media</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
+	<string>com.apple.ScriptEditor.id.Install-Create-Install-Media</string>
 	<key>CFBundleName</key>
-	<string>Create Install Media</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
+	<string>Install Create Install Media</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
-	<key>CFBundleSignature</key>
-	<string>aplt</string>
-	<key>LSMinimumSystemVersionByArchitecture</key>
-	<dict>
-		<key>x86_64</key>
-		<string>10.6</string>
-	</dict>
-	<key>LSRequiresCarbon</key>
-	<true/>
-	<key>LSUIElement</key>
-	<true/>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>This script needs to control other applications to run.</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>This script needs access to your music to run.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>This script needs access to your calendars to run.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This script needs access to your camera to run.</string>
-	<key>NSContactsUsageDescription</key>
-	<string>This script needs access to your contacts to run.</string>
-	<key>NSHomeKitUsageDescription</key>
-	<string>This script needs access to your HomeKit Home to run.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This script needs access to your microphone to run.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This script needs access to your photos to run.</string>
-	<key>NSRemindersUsageDescription</key>
-	<string>This script needs access to your reminders to run.</string>
-	<key>NSSiriUsageDescription</key>
-	<string>This script needs access to Siri to run.</string>
-	<key>NSSystemAdministrationUsageDescription</key>
-	<string>This script needs access to administer this system to run.</string>
-	<key>OSAAppletShowStartupScreen</key>
-	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2024 chris1111 , All Rights Reserved</string>
+	<key>OSAScriptingDefinition</key>
+	<string>AppleScript Language</string>
 	<key>WindowState</key>
 	<dict>
 		<key>bundleDividerCollapsed</key>
-		<true/>
+		<false/>
 		<key>bundlePositionOfDivider</key>
-		<real>0</real>
+		<real>510</real>
 		<key>dividerCollapsed</key>
 		<false/>
 		<key>eventLogLevel</key>
@@ -68,11 +25,11 @@
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>443</real>
+		<real>415</real>
 		<key>savedFrame</key>
-		<string>602 341 1050 678 0 0 1920 1055 </string>
+		<string>765 310 809 678 0 0 1920 1055 </string>
 		<key>selectedTab</key>
-		<string>description</string>
+		<string>result</string>
 	</dict>
 </dict>
 </plist>

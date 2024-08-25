@@ -10,9 +10,10 @@
 ## Troubleshooting Terminal ➦ tccutil reset AppleEvents
 
 Downnload ➤ [Install-Create-Install-Media](https://github.com/chris1111/Apple-Create-Install-Media/raw/main/Install%20Create%20Install%20Media.zip)
-### See Video How to Use ⬇︎
 
-[![Modular Image Creation](https://github.com/user-attachments/assets/68f65560-03ae-4dfe-908f-554e30e2906b)]()
+### See Video How to Use ⬇︎ To save time the video has been cut.
+
+[![Modular Image Creation](https://github.com/user-attachments/assets/68f65560-03ae-4dfe-908f-554e30e2906b)](https://youtu.be/9JFNZwOJZXQ)
 
 
 
