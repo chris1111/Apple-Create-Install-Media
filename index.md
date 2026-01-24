@@ -7,7 +7,7 @@ layout: default
 ### No fancy code
 ### Credit: Apple
 
-![Screenshot](https://github.com/user-attachments/assets/0eb7b95f-c39b-4e37-8de8-8a53d7c56ac7)
+<img width="592" height="411" alt="Screenshot" src="https://github.com/user-attachments/assets/1901ee0f-6349-41f0-9d54-5d200bf0d153" />
 
 
 ### `Gatekeeper` then `SIP Security` must be disabled to create macOS Install drive.
