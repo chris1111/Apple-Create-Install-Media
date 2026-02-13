@@ -1,7 +1,4 @@
 # Apple-Create-Install-Media
-
-<img src="https://hitscounter.dev/api/hit?url=https://github.com/chris1111&label=VISITORS&icon=gift&color=%23198754&message=&style=for-the-badge&tz=US%2FEastern">
-
 ### A simple macOS Applications for creating a bootable volume of macOS
 ### No fancy code
 ### Credit: Apple
