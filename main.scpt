@@ -1,5 +1,6 @@
 # Applescript create by chris1111
 # Copyright (c) 2020, 2026 chris1111 All rights reserved.
+# No right on OpenCore Bootloader
 #
 # Credit: Apple
 # Permission to use, copy, modify, and/or distribute this software for any
@@ -16,8 +17,6 @@
 # Vars
 -- ============================================================
 
--- Adjustable: how often (in seconds) the app re-activates itself
--- to keep the Dock progress visible. Lower = more insistent.
 
 set theAction to button returned of (display dialog "
 Welcome to Create Install Media
@@ -30,7 +29,7 @@ Starting with macOS Sonoma 14, some 16 GB USB drives are not sufficient, so use 
 
 NOTE: SIP security and Gatekeeper must be disabled.
 
-You must quit Disk Utility when you finish to format the USB drive." with icon note buttons {"Quit", "Create Install Media"} cancel button "Quit" default button "Create Install Media")
+You must Quit Disk Utilty when you finished to format the USB Media." with icon note buttons {"Quit", "Create Install Media"} cancel button "Quit" default button "Create Install Media")
 
 --If Create Install Media
 if theAction = "Create Install Media" then
@@ -136,13 +135,12 @@ end if
 --  ENGINE
 --  START COMMAND = the proven one for ALL installers
 --
---  Progress sources (take the biggest, never move backwards):
---  MODERN: log percentages (accurate steps) + df byte floor
---          -> the df floor keeps the bar alive during the
---          "Making disk bootable" gap after erase
---  LEGACY: df byte progress (log is buffered = blind)
---  df measures by mount path first, device node as fallback
---  (survives a mid-run volume rename)
+--  MODERN: log percentages (accurate steps) + blind-window
+--          creep -> THE PROVEN TAHOE 51% ENGINE (untouched)
+--  LEGACY: smooth landing curve - glides from 2% toward 96%,
+--          arriving right when "Done." lands. df removed:
+--          block restores show "full" from minute one and
+--          it caused the instant-90% jump.
 -- ============================================================
 
 on createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath, isLegacy)
@@ -154,18 +152,6 @@ on createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath, isLegacy)
 	-- Optional --applicationpath (Sierra & older)
 	set appPathArg to ""
 	if needsAppPath then set appPathArg to " --applicationpath \"" & OSXInstaller & "\""
-	
-	-- Installer size (df progress denominator) - both engines now
-	set totalKB to 0
-	try
-		set totalKB to (do shell script "du -sk " & quoted form of OSXInstaller & " | awk '{print $1}'") as integer
-	end try
-	
-	-- USB device node (df fallback that survives volume rename)
-	set diskDev to ""
-	try
-		set diskDev to do shell script "diskutil info " & quoted form of ("/Volumes/" & Diskpath) & " | awk '/Device Node/{print $3}'"
-	end try
 	
 	-- Clean old log
 	do shell script "rm -f " & logFile with administrator privileges
@@ -214,16 +200,12 @@ Installing macOS!  Wait until it's finished  . . ."
 			set newProgress to 0
 			
 			if isLegacy then
-				-- LEGACY: df is the only live source (log is buffered)
-				set bp to my getUSBProgress(Diskpath, diskDev, totalKB)
-				if bp > newProgress then set newProgress to bp
-				if newProgress is 0 then
-					-- df unavailable: gentle creep so the bar never looks dead
-					set newProgress to currentProgress + (90 - currentProgress) * 0.004
-				end if
+				-- LEGACY: smooth landing curve (the glide you saw
+				-- at 46%/51%). No df, no io - just a calm approach
+				-- to 96% that arrives as "Done." lands. Final hop 4%.
+				set newProgress to currentProgress + (96 - currentProgress) / 100
 			else
-				-- MODERN: log percentages ONLY (df lies on full sticks:
-				-- 16GB stick + 15GB installer = pegged early)
+				-- MODERN: log percentages ONLY (df lies on full sticks)
 				set newProgress to my calculateTrueProgress(logContent)
 				if newProgress is 2 or newProgress is 4 then
 					-- Blind window: erase done, copy not started.
@@ -260,36 +242,6 @@ Installing macOS!  Wait until it's finished  . . ."
 		end if
 	end repeat
 end createInstallerWithProgress
-
-
--- 📊 REAL progress: KB on the USB vs installer size -> 2 to 90%
--- Tries the mount path first, then the device node (rename-proof)
-on getUSBProgress(Diskpath, diskDev, totalKB)
-	if totalKB is 0 then return -1
-	
-	set usedKB to ""
-	try
-		set usedKB to do shell script "df -k " & quoted form of ("/Volumes/" & Diskpath) & " | awk 'NR==2 {print $3}'"
-	end try
-	
-	if usedKB is "" and diskDev is not "" then
-		set shortDev to diskDev
-		if shortDev starts with "/dev/" then set shortDev to text 6 thru -1 of shortDev
-		try
-			set usedKB to do shell script "df -k | awk '$1 ~ /" & shortDev & "$/ {print $3}' | tail -1"
-		end try
-	end if
-	
-	if usedKB is "" then return -1
-	
-	try
-		set pct to 2 + (88 * (usedKB as integer) / totalKB)
-		if pct > 90 then set pct to 90
-		return pct
-	on error
-		return -1
-	end try
-end getUSBProgress
 
 
 -- 🧮 MODERN progress : the proven percentage parsing
