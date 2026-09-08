@@ -16,23 +16,21 @@
 # Vars
 -- ============================================================
 
-set theAction to button returned of (display dialog "
-Welcome Create Install Media
-You can create a bootable USB key 
-from OS X Maverick 10.9 to macOS Tahoe 26
-		
-Format your USB Drive with Disk Utility 
-in the format Mac OS Extended (Journaled) 
-GUID Partition Map
-*****************************
+-- Adjustable: how often (in seconds) the app re-activates itself
+-- to keep the Dock progress visible. Lower = more insistent.
 
+set theAction to button returned of (display dialog "
+Welcome to Create Install Media
+You can create a bootable USB drive
+from OS X Mavericks 10.9 to macOS Tahoe 26. 
 
 To create a USB installation media, you need a 16 GB or larger USB drive.
 
 Starting with macOS Sonoma 14, some 16 GB USB drives are not sufficient, so use a 32 GB USB drive to avoid errors.
 
 NOTE: SIP security and Gatekeeper must be disabled.
-When you format the USB media, You must quit Disk Utility to continue " with icon note buttons {"Quit", "Create Install Media"} cancel button "Quit" default button "Create Install Media")
+
+You must quit Disk Utility when you finish to format the USB drive." with icon note buttons {"Quit", "Create Install Media"} cancel button "Quit" default button "Create Install Media")
 
 --If Create Install Media
 if theAction = "Create Install Media" then
@@ -56,32 +54,50 @@ Then press the OK button" OK button name "OK" with multiple selections allowed
 		return
 	end if
 	
-	set Diskpath to item 1 of Diskpath -- ⬅️ list → single volume name
+	set Diskpath to item 1 of Diskpath -- list -> single volume name
 	
 	try
 		set theAction to button returned of (display dialog "
 
 Choose the location of your Install macOS.app" with icon note buttons {"Quit", "10.9 to Tahoe 26"} cancel button "Quit" default button "10.9 to Tahoe 26")
 		
-		-- Sierra / El Capitan / Yosemite / Mavericks & older auto-get --applicationpath.
 		if theAction is in {"10.9 to Tahoe 26"} then
 			
 			set InstallOSX to choose file of type {"XLSX", "APPL"} default location (path to applications folder) with prompt "Choose your Install macOS.app"
 			set OSXInstaller to POSIX path of InstallOSX
 			
-			-- ✅ Sanity check: is it really a macOS installer?
+			-- Sanity check: is it really a macOS installer?
 			set CIMcheck to quoted form of (OSXInstaller & "/Contents/Resources/createinstallmedia")
 			set checkResult to do shell script "test -x " & CIMcheck & " && echo yes || echo no"
 			if checkResult is "no" then
-				display dialog "❌ That app is not a valid macOS installer.
+				display dialog "That app is not a valid macOS installer.
 (createinstallmedia not found inside it.)" with icon stop buttons {"OK"} default button "OK"
 				return
 			end if
 			
-			-- 🕰️ Sierra / El Capitan / Yosemite / Mavericks need --applicationpath
-			set needsAppPath to false
+			-- Classify by NAME (High Sierra's plist reports "13.6.06" - names don't lie)
+			-- LEGACY = Mavericks / Yosemite / El Capitan / Sierra / High Sierra
 			set nm to name of (info for InstallOSX)
-			if nm contains "Sierra" or nm contains "El Capitan" or nm contains "Yosemite" or nm contains "Mavericks" then set needsAppPath to true
+			set isLegacy to false
+			if nm contains "Mavericks" then set isLegacy to true
+			if nm contains "Yosemite" then set isLegacy to true
+			if nm contains "El Capitan" then set isLegacy to true
+			if nm contains "Sierra" then set isLegacy to true
+			
+			if isLegacy then
+				set formatText to "Legacy"
+			else
+				set formatText to "Modern"
+			end if
+			
+			-- --applicationpath only for Sierra 10.12 and older
+			set needsAppPath to false
+			if isLegacy then
+				if (nm contains "Sierra" and nm does not contain "High Sierra") then set needsAppPath to true
+				if nm contains "El Capitan" then set needsAppPath to true
+				if nm contains "Yosemite" then set needsAppPath to true
+				if nm contains "Mavericks" then set needsAppPath to true
+			end if
 			
 			delay 2
 			set confirmed to button returned of (display dialog "
@@ -90,34 +106,46 @@ Please confirm your choice?
 Create Install Media from --> " & POSIX path of InstallOSX & "
 Install to --> " & Diskpath & "
 
-⚠️ Everything on this volume will be ERASED!" with icon note buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK")
+App name: " & nm & "
+Engine: " & formatText & "
+
+⚠️: Everything on this volume will be ERASED!" with icon note buttons {"Cancel", "OK"} cancel button "Cancel" default button "OK")
 			
 			if confirmed is "OK" then
-				-- 🚀 RUN WITH REAL PROGRESS BAR
 				delay 2
-				set finalProgress to createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath)
+				set finalProgress to createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath, isLegacy)
 				
-				set endAction to button returned of (display dialog "✅ Install media created successfully!
+				set endAction to button returned of (display dialog "Install media created successfully!
 
 " & Diskpath & " is now bootable." with icon note buttons {"Done"} default button "Done" giving up after 30)
 				delay 3
+				
 			end if
 		end if
 		
 	on error errMsg number errNum
-		-- -128 = user pressed Cancel → exit silently
+		-- -128 = user pressed Cancel -> exit silently
 		if errNum is not -128 then
-			display dialog "❌ Error: " & errMsg with icon stop buttons {"OK"} default button "OK"
+			display dialog "Error: " & errMsg with icon stop buttons {"OK"} default button "OK"
 		end if
 	end try
 end if
 
 
 -- ============================================================
---  ENGINE — do not touch below unless you know why
+--  ENGINE
+--  START COMMAND = the proven one for ALL installers
+--
+--  Progress sources (take the biggest, never move backwards):
+--  MODERN: log percentages (accurate steps) + df byte floor
+--          -> the df floor keeps the bar alive during the
+--          "Making disk bootable" gap after erase
+--  LEGACY: df byte progress (log is buffered = blind)
+--  df measures by mount path first, device node as fallback
+--  (survives a mid-run volume rename)
 -- ============================================================
 
-on createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath)
+on createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath, isLegacy)
 	set logFile to "/tmp/cim_progress.log"
 	
 	-- Normalize: ensure trailing slash on installer path
@@ -127,12 +155,27 @@ on createInstallerWithProgress(OSXInstaller, Diskpath, needsAppPath)
 	set appPathArg to ""
 	if needsAppPath then set appPathArg to " --applicationpath \"" & OSXInstaller & "\""
 	
+	-- Installer size (df progress denominator) - both engines now
+	set totalKB to 0
+	try
+		set totalKB to (do shell script "du -sk " & quoted form of OSXInstaller & " | awk '{print $1}'") as integer
+	end try
+	
+	-- USB device node (df fallback that survives volume rename)
+	set diskDev to ""
+	try
+		set diskDev to do shell script "diskutil info " & quoted form of ("/Volumes/" & Diskpath) & " | awk '/Device Node/{print $3}'"
+	end try
+	
 	-- Clean old log
 	do shell script "rm -f " & logFile with administrator privileges
 	
-	-- Start createinstallmedia in BACKGROUND, output → log file
+	-- THE PROVEN START COMMAND - identical for legacy and modern
 	set startCmd to "sudo \"" & OSXInstaller & "Contents/Resources/createinstallmedia\" --volume /Volumes/\"" & Diskpath & "\"" & appPathArg & " --nointeraction > " & logFile & " 2>&1 &"
 	do shell script startCmd with administrator privileges
+	
+	-- Refocus right after the password prompt (as in the visible version)
+	activate me
 	
 	-- Init progress bar
 	set currentProgress to 0
@@ -145,7 +188,7 @@ Installation time 15 to 25 min on a standard USB key
 ======================================
 Installing macOS!  Wait until it's finished  . . ."
 	
-	-- Polling loop
+	-- Polling loop (structure of the proven GUI-visible version)
 	repeat
 		delay 1
 		
@@ -154,23 +197,61 @@ Installing macOS!  Wait until it's finished  . . ."
 			set logContent to do shell script "cat " & logFile & " 2>/dev/null"
 		end try
 		
-		if logContent is not "" then
-			set currentProgress to my calculateTrueProgress(logContent)
-			set progress completed steps to (round currentProgress)
-			set progress additional description to ((round currentProgress) as string) & "%"
-		end if
-		
-		-- Done?
+		-- Done? Modern: "Install media now available"
+		--        Legacy: "Done." appears when the buffer flushes at exit
 		if logContent contains "Install media now available" then
 			set progress completed steps to 100
 			set progress additional description to "100%"
 			return 100
 		end if
+		if logContent contains "Done." and logContent does not contain "fail" then
+			set progress completed steps to 100
+			set progress additional description to "100%"
+			return 100
+		end if
 		
-		-- Process died without finishing → fail loudly
+		if logContent is not "" then
+			set newProgress to 0
+			
+			if isLegacy then
+				-- LEGACY: df is the only live source (log is buffered)
+				set bp to my getUSBProgress(Diskpath, diskDev, totalKB)
+				if bp > newProgress then set newProgress to bp
+				if newProgress is 0 then
+					-- df unavailable: gentle creep so the bar never looks dead
+					set newProgress to currentProgress + (90 - currentProgress) * 0.004
+				end if
+			else
+				-- MODERN: log percentages ONLY (df lies on full sticks:
+				-- 16GB stick + 15GB installer = pegged early)
+				set newProgress to my calculateTrueProgress(logContent)
+				if newProgress is 2 or newProgress is 4 then
+					-- Blind window: erase done, copy not started.
+					-- Tahoe flushes "Making disk bootable" only when
+					-- copy begins, so the gap reads as 2 -> creep gently.
+					set creep to currentProgress + 0.05
+					if creep > 12 then set creep to 12
+					set newProgress to creep
+				end if
+			end if
+			
+			if newProgress > currentProgress then
+				set currentProgress to newProgress
+			end if
+			set progress completed steps to (round currentProgress)
+			set progress additional description to ((round currentProgress) as string) & "%"
+		end if
+		
+		-- Process died without finishing -> fail loudly
 		set isRunning to do shell script "pgrep -x createinstallmedia > /dev/null && echo yes || echo no"
 		if isRunning is "no" and logContent is not "" then
 			if logContent does not contain "Install media now available" then
+				if logContent contains "Done." and logContent does not contain "fail" then
+					-- legacy success caught at process exit
+					set progress completed steps to 100
+					set progress additional description to "100%"
+					return 100
+				end if
 				if (length of logContent) > 400 then
 					set logContent to text ((length of logContent) - 399) thru -1 of logContent
 				end if
@@ -181,7 +262,37 @@ Installing macOS!  Wait until it's finished  . . ."
 end createInstallerWithProgress
 
 
--- 🧮 TRUE weighted progress — auto-detects phase order
+-- 📊 REAL progress: KB on the USB vs installer size -> 2 to 90%
+-- Tries the mount path first, then the device node (rename-proof)
+on getUSBProgress(Diskpath, diskDev, totalKB)
+	if totalKB is 0 then return -1
+	
+	set usedKB to ""
+	try
+		set usedKB to do shell script "df -k " & quoted form of ("/Volumes/" & Diskpath) & " | awk 'NR==2 {print $3}'"
+	end try
+	
+	if usedKB is "" and diskDev is not "" then
+		set shortDev to diskDev
+		if shortDev starts with "/dev/" then set shortDev to text 6 thru -1 of shortDev
+		try
+			set usedKB to do shell script "df -k | awk '$1 ~ /" & shortDev & "$/ {print $3}' | tail -1"
+		end try
+	end if
+	
+	if usedKB is "" then return -1
+	
+	try
+		set pct to 2 + (88 * (usedKB as integer) / totalKB)
+		if pct > 90 then set pct to 90
+		return pct
+	on error
+		return -1
+	end try
+end getUSBProgress
+
+
+-- 🧮 MODERN progress : the proven percentage parsing
 on calculateTrueProgress(logContent)
 	set AppleScript's text item delimiters to ""
 	
@@ -190,7 +301,7 @@ on calculateTrueProgress(logContent)
 	set erasePos to 0
 	set copyPos to 0
 	set bootPos to 0
-	if logContent contains "Erasing disk:" then set erasePos to offset of "Erasing disk:" in logContent
+	if logContent contains "Erasing disk" then set erasePos to offset of "Erasing disk" in logContent
 	if logContent contains "Copying to disk:" then set copyPos to offset of "Copying to disk:" in logContent
 	if logContent contains "Making disk bootable" then set bootPos to offset of "Making disk bootable" in logContent
 	
@@ -207,7 +318,7 @@ on calculateTrueProgress(logContent)
 	end if
 	
 	if lastPhase is "erase" then
-		set erasePct to my extractLatestPercentage(logContent, "Erasing disk:")
+		set erasePct to my extractLatestPercentage(logContent, "Erasing disk")
 		return 2 * erasePct / 100
 		
 	else if lastPhase is "copy" then
@@ -230,7 +341,7 @@ on calculateTrueProgress(logContent)
 end calculateTrueProgress
 
 
--- 🔍 Latest % for a phase (reads digits BACKWARDS → always newest)
+-- 🔍 Latest % for a phase (reads digits BACKWARDS -> always newest)
 on extractLatestPercentage(logContent, phaseName)
 	set AppleScript's text item delimiters to phaseName
 	set phaseParts to text items of logContent
